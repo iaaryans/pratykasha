@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Detail • Pratyaksha</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Boxicons CDN -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+
+<body class="bg-[#f9f9fb] text-gray-900 overflow-x-hidden">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm fixed top-0 w-full z-40">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="index.html"><img src="image/logo.png" alt="Logo" class="h-8" /></a>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="text-sm text-gray-600">Hi, <span id="user-name">{username}</span></span>
+        <img src="image/avatar.png" alt="Avatar" class="h-8 w-8 rounded-full border border-gray-300" />
+        <button id="logoutBtn" class="flex items-center space-x-1 text-gray-600 hover:text-red-600 text-sm transition">
+          <i class='bx bx-log-out text-lg'></i><span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-24 pb-20 px-6 sm:px-10 lg:px-16 max-w-5xl mx-auto">
+    <!-- Employee Overview -->
+    <section class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-10">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">Employee Info</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-gray-700">
+        <div><label class="block font-medium text-gray-600">Full Name</label><p id="detailName" class="mt-1 font-semibold text-base text-gray-800">Loading...</p></div>
+        <div><label class="block font-medium text-gray-600">Employee ID</label><p id="detailEmpID" class="mt-1 text-gray-800"></p></div>
+        <div><label class="block font-medium text-gray-600">Date of Birth</label><p id="detailDOB" class="mt-1 text-gray-800"></p></div>
+        <div><label class="block font-medium text-gray-600">Mobile Number</label><p id="detailMobile" class="mt-1 text-gray-800"></p></div>
+      </div>
+      <div class="mt-6 flex gap-4">
+        <button id="editBtn" class="px-4 py-2 rounded-lg border border-blue-500 text-blue-600 hover:bg-blue-50 text-sm">Edit</button>
+        <button id="deleteBtn" class="px-4 py-2 rounded-lg border border-red-500 text-red-600 hover:bg-red-50 text-sm">Delete</button>
+      </div>
+    </section>
+
+    <!-- Attendance Chart -->
+    <section class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-10">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Current Month Attendance</h2>
+      </div>
+      <div class="bg-white shadow-md rounded-lg p-6 mb-8" style="height: 300px;">
+        <canvas id="attendanceChart"></canvas>
+      </div>
+
+    </section>
+
+    <!-- Attendance Table -->
+    <section class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-10">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Attendance History</h2>
+        <button id="downloadBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-xl text-sm">Download Report</button>
+      </div>
+      <div class="overflow-x-auto rounded-xl border border-gray-200">
+        <table class="min-w-full text-sm text-left text-gray-700">
+          <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+            <tr>
+              <th class="px-4 py-3">Date</th>
+              <th class="px-4 py-3">Time</th>
+              <th class="px-4 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="historyTable" class="divide-y divide-gray-100">
+            <!-- Rows will be injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Employee Details Modal -->
+<div id="employeeDetailsModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+    <button id="closeEmployeeModalBtn" class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl">
+      &times;
+    </button>
+
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit Employee</h2>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Full Name</label>
+        <input id="empDetailName" type="text" class="w-full mt-1 border rounded-md px-3 py-2 text-sm bg-gray-50" readonly>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Employee ID</label>
+        <input id="empDetailID" type="text" class="w-full mt-1 border rounded-md px-3 py-2 text-sm bg-gray-100" readonly>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Date of Birth</label>
+        <input id="empDetailDOB" type="date" class="w-full mt-1 border rounded-md px-3 py-2 text-sm bg-gray-50" readonly>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Mobile Number</label>
+        <input id="empDetailMobile" type="tel" class="w-full mt-1 border rounded-md px-3 py-2 text-sm bg-gray-50" readonly>
+      </div>
+    </div>
+
+    <div class="flex justify-between mt-6">
+      <button id="editEmployeeBtn" class="px-4 py-2 rounded-lg border border-blue-500 text-blue-600 hover:bg-blue-50 text-sm">Edit</button>
+      <button id="saveChangesBtn" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hidden">Save</button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+  <!-- Logic -->
+  <script src="employeeDetail.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+  <!DOCTYPE html>
+  <html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard • Pratyaksha</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Boxicons CDN -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+
+
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+
+      #preloader {
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+
+      #preloader.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+      @keyframes fade-in {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      .animate-fade-in {
+        animation: fade-in 0.25s ease-out;
+      }
+
+
+      
+      
+    </style>
+  </head>
+  <body class="bg-[#f9f9fb] text-gray-900 overflow-x-hidden">
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+      <img src="image/logo.png" alt="Logo" class="h-10 animate-pulse" />
+    </div>
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm fixed top-0 w-full z-40">
+      <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-4 flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <img src="image/logo.png" alt="Logo" class="h-8" />
+        </div>
+
+        <!-- Right Side: User Info -->
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600">Hello, <span id="user-name">{username}</span></span>
+
+          <!-- Avatar -->
+          <img src="image/avatar.png" alt="Avatar" class="h-8 w-8 rounded-full border border-gray-300" />
+
+          <!-- Logout Button -->
+          <button id="logoutBtn" class="flex items-center space-x-1 text-gray-600 hover:text-red-600 text-sm transition">
+            <i class='bx bx-log-out text-lg'></i>
+            <span>Logout</span>
+
+          </button>
+        </div>
+      </div>
+    </header>
+
+
+    <main class="pt-24 pb-16 px-6 sm:px-10 lg:px-16 max-w-7xl mx-auto">
+      <!-- Welcome -->
+      <section class="mb-12">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Welcome back,</h1>
+        <p class="text-sm sm:text-base text-gray-500 mt-2">
+          You're managing servers and attendance for <span class="font-medium text-blue-600 font-semibold">{companyName}</span>. Stay in control with real-time geolocation and employee insights.
+        </p>
+      </section>
+
+
+      <!-- Dashboard Grid -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+        <!-- Left Column: Create Server -->
+        <div class="col-span-1">
+          <div class="border border-gray-200 bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition hover:bg-gray-50">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-gray-800">Create Server</h2>
+              <div class="bg-blue-100 text-blue-600 p-2 rounded-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">Start a new server with custom geolocation range and parameters.</p>
+            <button class="mt-5 w-full bg-blue-600 hover:bg-blue-700 transition text-white py-2 px-4 text-sm font-medium rounded-lg">Create Server</button>
+          </div>
+        </div>
+
+        <!-- Server Cards -->
+        <div class="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+          <!-- dynamic server cards can be added here -->
+
+        </div>
+      </section>
+
+      <!-- Attendance Chart Section -->
+      <section class="mt-16 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition hover:bg-gray-50">
+        <div class="mb-5">
+          <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+            <i class='bx bx-bar-chart-alt-2 text-blue-600 text-2xl'></i>
+            Attendance Overview
+          </h2>
+
+          <p class="text-sm text-gray-500">See how your servers are performing based on recent attendance data.</p>
+        </div>
+
+        <div class="w-full overflow-x-auto">
+          <canvas id="attendanceChart" class="max-w-full h-80"></canvas>
+        </div>
+      </section>
+
+    </main>
+
+  <!-- Modal Overlay -->
+  <div id="createServerModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 hidden flex items-center justify-center transition-all duration-300">
+    <!-- Modal Card -->
+    <div
+      class="bg-white rounded-3xl border border-gray-200 shadow-xl max-w-lg w-full p-6 sm:p-8 relative animate-fade-in transition-all duration-300 ease-in-out flex flex-col max-h-[90vh]"
+      style="box-sizing: border-box;"
+    >
+
+      <!-- Close Icon -->
+      <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl transition-all z-10">
+        <i class='bx bx-x'></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="mb-4 flex-shrink-0">
+        <h2 class="text-[1.65rem] font-semibold text-gray-900 tracking-tight">Create New Server</h2>
+        <p class="text-sm text-gray-500 mt-1">Define location, name, and range for your new attendance zone.</p>
+      </div>
+
+      <!-- Map Preview -->
+      <div class="mb-4 flex-shrink-0">
+        <div id="mapPreview" class="w-full h-40 sm:h-48 bg-gray-200 rounded-xl overflow-hidden"></div>
+        <button type="button" id="detectLocationBtn"
+          class="mt-3 w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-sm hover:shadow-md text-sm">
+          📍 Auto Detect Location
+        </button>
+        <p class="mt-2 text-sm text-gray-600">Detected Location: <span id="detectedLocation" class="text-blue-600 font-semibold">Not set</span></p>
+      </div>
+
+      <!-- Modal Form -->
+      <form id="createServerForm" class="space-y-5 text-sm overflow-y-auto flex-grow min-h-0 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <!-- Server Name -->
+        <div>
+          <label class="block text-gray-600 font-medium mb-1">Server Name</label>
+          <input type="text" id="serverName" placeholder="e.g., Bihar HQ" required autocomplete="off"
+            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition" />
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-gray-600 font-medium mb-1">Description</label>
+          <textarea id="serverDescription" rows="3" placeholder="Brief description of server..."
+            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></textarea>
+        </div>
+
+        <!-- Range -->
+        <div>
+          <label class="block text-gray-600 font-medium mb-1">Range:
+            <span id="rangeValue" class="text-blue-600 font-semibold">500</span> meters
+          </label>
+          <input type="range" id="serverRange" min="100" max="1000" step="50" value="500"
+            class="w-full accent-blue-600 cursor-pointer mt-1" />
+        </div>
+
+        <input type="hidden" id="serverLocation" name="serverLocation">
+
+        <!-- Create Button -->
+        <button type="submit"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-sm hover:shadow-md text-sm">
+          + Create Server
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+
+
+
+
+    <!-- Preloader Fade-Out -->
+    <script>
+      window.addEventListener("load", () => {
+        document.getElementById("preloader").classList.add("hidden");
+      });
+    </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+  <script src="dashboard.js"></script>
+
+
+  </body>
+  </html>

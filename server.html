@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset=" UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Server Management • Pratyaksha</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Boxicons CDN -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    #preloader {
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    @keyframes fade-in {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.25s ease-out;
+      }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;  /* IE & Edge */
+      scrollbar-width: none;     /* Firefox */
+    }
+  </style>
+</head>
+
+<body class="bg-[#f9f9fb] text-gray-900 overflow-x-hidden">
+
+  <!-- Preloader -->
+  <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+    <img src="image/logo.png" alt="Logo" class="h-10 animate-pulse" />
+  </div>
+
+  <!-- Navbar -->
+  <header class="bg-white shadow-sm fixed top-0 w-full z-40">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <img src="image/logo.png" alt="Logo" class="h-8" />
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="text-sm text-gray-600">Hello, <span id="user-name">{username}</span></span>
+        <img src="image/avatar.png" alt="Avatar" class="h-8 w-8 rounded-full border border-gray-300" />
+        <button id="logoutBtn" class="flex items-center space-x-1 text-gray-600 hover:text-red-600 text-sm transition">
+          <i class='bx bx-log-out text-lg'></i><span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-24 pb-16 px-6 sm:px-10 lg:px-16 max-w-7xl mx-auto">
+
+    <!-- Server Info -->
+    <section class="mb-10 flex items-center justify-between">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight" id="serverName">
+        {serverName} — Employee Management
+      </h1>
+      <button id="deleteServerBtn" 
+        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+        title="Delete Server">
+        Delete Server
+      </button>
+    </section>
+
+
+    <!-- Employee Section -->
+    <section class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+          <i class='bx bx-group text-blue-600 text-2xl'></i>
+          Employees
+        </h2>
+        <button id="addEmployeeBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition">
+          + Add Employee
+        </button>
+      </div>
+
+      <!-- Employee Table -->
+      <div class="overflow-x-auto mt-8 rounded-xl shadow">
+        <table class="min-w-full divide-y divide-gray-200 bg-white rounded-xl">
+          <thead class="bg-gray-100 text-gray-600 text-sm">
+            <tr>
+              <th class="px-6 py-3 text-left font-semibold">Name</th>
+              <th class="px-6 py-3 text-left font-semibold">Employee ID</th>
+              <th class="px-6 py-3 text-left font-semibold">DOB</th>
+              <th class="px-6 py-3 text-left font-semibold">Mobile</th>
+              <th class="px-6 py-3 text-left font-semibold">Auth Code</th>
+              <th class="px-6 py-3 text-left font-semibold">Joined</th>
+            </tr>
+          </thead>
+          <tbody id="employeeList" class="divide-y divide-gray-100 text-gray-700 text-sm">
+            <!-- JS will insert rows here -->
+          </tbody>
+        </table>
+      </div>
+
+
+    </section>
+
+    <!-- Analytics Chart -->
+    <section class="mt-16 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
+      <div class="mb-5">
+        <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+          <i class='bx bx-bar-chart text-blue-600 text-2xl'></i>
+          Attendance Stats
+        </h2>
+        <p class="text-sm text-gray-500">Visualize recent attendance trends of this server.</p>
+      </div>
+      <div class="w-full overflow-x-auto">
+        <canvas id="serverChart" class="max-w-full h-80"></canvas>
+      </div>
+    </section>
+  </main>
+
+    <!-- Add Employee Modal -->
+    <div id="addEmployeeModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-3xl border border-gray-200 shadow-xl max-w-md w-full p-8 sm:p-10 relative animate-fade-in">
+        
+        <!-- Close Button -->
+        <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl">
+        <i class='bx bx-x'></i>
+        </button>
+        
+        <!-- Modal Title -->
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Add New Employee</h2>
+        
+        <!-- Form -->
+        <form id="addEmployeeForm" class="space-y-4 text-sm">
+
+        <!-- Name -->
+        <div>
+            <label for="empName" class="block mb-1 text-gray-600 font-medium">Employee Name</label>
+            <input type="text" id="empName" autocomplete="off" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required />
+        </div>
+
+        <!-- Employee ID -->
+        <div>
+            <label for="empID" class="block mb-1 text-gray-600 font-medium">Employee ID</label>
+            <input type="text" id="empID" autocomplete="off"  class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required />
+        </div>
+
+        <!-- Date of Birth -->
+        <div>
+            <label for="empDOB" class="block mb-1 text-gray-600 font-medium">Date of Birth</label>
+            <input type="date" id="empDOB" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required />
+        </div>
+
+        <!-- Mobile Number -->
+        <div>
+            <label for="empMobile" class="block mb-1 text-gray-600 font-medium">Mobile Number</label>
+            <input type="tel" id="empMobile" autocomplete="off" maxlength="10" pattern="[0-9]{10,15}" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required />
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl font-medium transition">
+            Add Employee
+        </button>
+        </form>
+    </div>
+    </div>
+
+    <!-- Employee Details Modal -->
+    <div id="employeeDetailsModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 hidden flex items-center justify-center transition-all duration-300">
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-xl max-w-3xl w-full p-8 sm:p-10 relative animate-fade-in transition-all duration-300 ease-in-out overflow-y-auto max-h-[90vh] hide-scrollbar">
+
+        <!-- Close Button -->
+        <button id="closeEmployeeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl transition-all">
+          <i class='bx bx-x'></i>
+        </button>
+
+        <!-- Modal Header -->
+        <div class="mb-6">
+          <h2 class="text-[1.65rem] font-semibold text-gray-900 tracking-tight">Employee Details</h2>
+          <p class="text-sm text-gray-500 mt-1">View, edit, or manage this employee’s information and attendance.</p>
+        </div>
+
+        <!-- Employee Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm mb-6">
+          <div>
+            <label class="block text-gray-600 font-medium mb-1">Full Name</label>
+            <input type="text" id="empDetailName" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" readonly autocomplete="off" />
+          </div>
+          <div>
+            <label class="block text-gray-600 font-medium mb-1">Employee ID</label>
+            <input type="text" id="empDetailID" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" readonly autocomplete="off" />
+          </div>
+          <div>
+            <label class="block text-gray-600 font-medium mb-1">Date of Birth</label>
+            <input type="text" id="empDetailDOB" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" readonly autocomplete="off" />
+          </div>
+          <div>
+            <label class="block text-gray-600 font-medium mb-1">Mobile Number</label>
+            <input type="text" id="empDetailMobile" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" readonly autocomplete="off" />
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex flex-wrap items-center gap-4 mb-6">
+          <button id="editEmployeeBtn" class="px-4 py-2 text-sm rounded-lg border border-blue-500 text-blue-600 hover:bg-blue-50 transition">Edit</button>
+          <button id="deleteEmployeeBtn" class="px-4 py-2 text-sm rounded-lg border border-red-500 text-red-600 hover:bg-red-50 transition">Delete</button>
+          <button id="saveChangesBtn" class="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition hidden">Save Changes</button>
+        </div>
+
+        <!-- Attendance History Table -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3">Attendance History</h3>
+          <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="min-w-full text-sm text-left text-gray-700">
+              <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                <tr>
+                  <th class="px-4 py-3">Date</th>
+                  <th class="px-4 py-3">Check-In</th>
+                  <th class="px-4 py-3">Check-Out</th>
+                  <th class="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTable" class="divide-y divide-gray-100">
+                <!-- Dynamically filled via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3">Monthly Attendance Chart</h3>
+          <canvas id="attendanceChart" height="200" class="w-full"></canvas>
+        </div>
+
+        <!-- Download Button -->
+        <div class="flex justify-end">
+          <button id="downloadReportBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition">Download Full Report</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- Preloader Fade -->
+  <script>
+    window.addEventListener("load", () => {
+      document.getElementById("preloader").classList.add("hidden");
+    });
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+  <!-- JS Logic -->
+  <script src="server.js"></script>
+</body>
+</html>

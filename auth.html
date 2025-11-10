@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Authentication • Pratyaksha | Advanced Attendance System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.05);
+    }
+    .fade {
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease;
+    }
+    #preloader {
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+      animation: fade-in-up 0.3s ease-out;
+      transition: opacity 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-tr from-white via-blue-50 to-purple-100 min-h-screen flex items-center justify-center">
+
+  <!-- Preloader -->
+  <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-tr from-white via-blue-50 to-purple-100">
+    <img src="image/logo.png" alt="Pratyaksha Logo" class="h-10 animate-pulse">
+  </div>
+
+  <div class="w-full max-w-6xl mx-auto grid md:grid-cols-2 items-center gap-10 px-6 md:px-10 py-12">
+    <!-- Illustration Panel -->
+    <div class="hidden md:flex flex-col justify-center items-start space-y-6">
+      <img src="image/login-visual.svg" alt="Login Visual" class="w-[6rem] max-w-sm" />
+      <h2 class="text-4xl font-semibold text-gray-800">Smart Attendance with Pratyaksha</h2>
+      <p class="text-gray-500 text-base leading-relaxed max-w-md">Experience seamless attendance powered by advanced facial recognition and geolocation. Built for modern campuses.</p>
+    </div>
+
+    <!-- Auth Card -->
+    <div class="glass w-full max-w-md rounded-2xl border border-gray-200 p-8 shadow-xl backdrop-blur-2xl">
+      <!-- Logo -->
+      <div class="mb-6 text-center">
+        <img src="image/logo.png" class="mx-auto h-12" alt="Pratyaksha Logo">
+        <h2 id="formTitle" class="text-xl font-semibold mt-4 text-gray-800">Login to Your Account</h2>
+      </div>
+
+      <!-- Forms -->
+      <div id="formWrapper">
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-5 fade">
+          <input id="loginEmail" type="email" placeholder="Email address" required autocomplete="off"
+            class="w-full px-4 py-3 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <div class="relative">
+            <input type="password" placeholder="Password" id="loginPassword" required autocomplete="off"
+              class="w-full px-4 py-3 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute inset-y-0 right-3 flex items-center text-gray-500 text-sm">Show</button>
+          </div>
+          <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium text-sm transition duration-200 shadow-md">
+            Login
+          </button>
+          <div class="text-center text-sm text-gray-600">
+            Don’t have an account?
+            <button type="button" onclick="switchForm('signup')" class="text-blue-600 hover:underline">Create one</button>
+          </div>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signupForm" class="space-y-5 fade hidden">
+          <input id="signupName" type="text" placeholder="Full Name" required autocomplete="off"
+            class="w-full px-4 py-3 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="signupEmail" type="email" placeholder="Email address" required autocomplete="off"
+            class="w-full px-4 py-3 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="signupCompany" type="text" placeholder="Company Name" required autocomplete="off"
+            class="w-full px-4 py-3 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <div class="relative">
+            <input id="signupPassword" type="password" placeholder="Create Password" required autocomplete="off"
+              class="w-full px-4 py-3 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button type="button" onclick="togglePassword('signupPassword', this)" class="absolute inset-y-0 right-3 flex items-center text-gray-500 text-sm">Show</button>
+          </div>
+          <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium text-sm transition duration-200 shadow-md">
+            Create Account
+          </button>
+          <div class="text-center text-sm text-gray-600">
+            Already have an account?
+            <button type="button" onclick="switchForm('login')" class="text-blue-600 hover:underline">Login</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
+  <script defer src="auth.js"></script>
+
+</body>
+</html>
