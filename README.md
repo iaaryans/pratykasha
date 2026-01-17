@@ -92,4 +92,5 @@ graph TD
 
 ---
 
-<div align="center"> <h3>Designed & Developed by <a href="https://www.google.com/search?q=https://github.com/computerBoy-dev">Aaryan</a></h3> <p> <em>Bridging the gap between physical presence and digital verification.</em> </p> </div>
+<div align="center"> <h3>Designed & Developed by <a href="https://github.com/computerBoy-dev">Aaryan</a></h3> <p> Built with ❤️ and ☕ for developers. </p> </div>
+
