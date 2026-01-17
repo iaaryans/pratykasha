@@ -11,8 +11,8 @@
   </p>
 
   <p align="center">
-    <a href="https://your-deployment-link.com">
-      <img src="https://img.shields.io/github/deployments/computerBoy-dev/pratyaksha/github-pages?style=for-the-badge&logo=github&label=Live%20Demo" alt="Deployment Status" />
+    <a href="#">
+      <img src="https://img.shields.io/badge/Status-Live_Beta-success?style=for-the-badge" alt="Status" />
     </a>
   </p>
   
@@ -48,7 +48,7 @@ Unlike traditional biometric systems that require hardware, Pratyaksha turns any
 
 ### 👤 The Employee Portal
 * **AI Face Authentication:** Uses `face-api.js` to generate 128-point face descriptors, ensuring high-accuracy identity verification (Threshold: 0.35) directly in the browser.
-* **Passwordless Entry:** secure login using a unique Auth Code + Date of Birth combination, reducing login friction while maintaining security.
+* **Passwordless Entry:** Secure login using a unique Auth Code + Date of Birth combination, reducing login friction while maintaining security.
 * **Live Liveness & Location Check:** Attendance is only marked if the user matches the registered face **AND** is physically located within the Admin-defined geofence.
 
 ### 🛡️ Smart Security & Logic
@@ -75,3 +75,21 @@ graph TD
     D -- Outside Range --> E[Location Error]
     D -- Inside Range --> F[Write to Firestore]
     F --> G[Admin Dashboard Updates Real-Time]
+```
+
+---
+
+## 💻 Tech Stack
+
+| Component | Technology | Role |
+| :--- | :--- | :--- |
+| **Frontend Core** | HTML5, ES6 Modules | Lightweight, fast execution without bundlers. |
+| **Styling** | Tailwind CSS | Rapid, responsive, and glassmorphism UI design. |
+| **AI / ML** | face-api.js (TensorFlow.js) | Client-side face detection and recognition. |
+| **Database** | Firebase Firestore | Real-time NoSQL database and offline persistence. |
+| **Mapping** | Leaflet.js | Open-source interactive maps for geofencing. |
+| **Alerts** | SweetAlert2 | Professional, responsive modal dialogs. |
+
+---
+
+<div align="center"> <h3>Designed & Developed by <a href="https://www.google.com/search?q=https://github.com/computerBoy-dev">Aaryan</a></h3> <p> <em>Bridging the gap between physical presence and digital verification.</em> </p> </div>
