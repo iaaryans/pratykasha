@@ -9,12 +9,6 @@
   <p align="center">
     A robust, fraud-proof attendance solution combining AI-powered Face Recognition with GPS Geofencing.
   </p>
-
-  <p align="center">
-    <a href="#">
-      <img src="https://img.shields.io/badge/Status-Live_Beta-success?style=for-the-badge" alt="Status" />
-    </a>
-  </p>
   
   <p align="center">
     <img src="https://img.shields.io/badge/AI_Engine-Face_API.js-blue?style=for-the-badge&logo=javascript" />
