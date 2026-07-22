@@ -325,3 +325,26 @@ Built by Aaryan.
 ---
 
 If you find a bug or want to contribute, contributions and feedback are welcome.
+
+## Keywords
+
+Pratyaksha
+Attendance System
+Biometric Attendance
+Face Recognition
+Face API.js
+GPS Geofencing
+Location Based Attendance
+Employee Management
+Workforce Management
+Attendance Tracking
+Firebase
+Firestore
+Computer Vision
+Browser AI
+JavaScript
+Web Application
+Authentication
+HR Technology
+Location Verification
+Time Attendance
